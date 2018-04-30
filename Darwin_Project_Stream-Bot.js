@@ -38,7 +38,7 @@ bot.on("message", async message => {
     //#endregion
 
     //#region Permission
-    const BOT_MANAGE_CHANNELSPerm = message.guild.channels.find("id", message.channel.id).permissionsFor(message.guild.me).has("MANAGE_CHANNELS") && message.channel.type === 'text'
+    //const BOT_MANAGE_CHANNELSPerm = message.guild.channels.find("id", message.channel.id).permissionsFor(message.guild.me).has("MANAGE_CHANNELS") && message.channel.type === 'text'
 
     //#endregion
 
@@ -126,14 +126,6 @@ bot.on("presenceUpdate", async (oldmember, newmember) => {
                         console.log("he dont have streamer role");
                         user.addRole(streamer_role)
                     }
-
-                    console.log(user.roles.array());
-
-                    /*user.removeRole(439952334953381919)
-                        .catch(err => {
-                            console.log(err);
-                        })
-                    */
                 })
         }
 
