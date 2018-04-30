@@ -1,0 +1,12 @@
+{
+  "name": "test",
+  "description": "New bot for discord",
+  "version": "0.0.0",
+  "main": "Darwin_Project_Stream-Bot.js",
+  "scripts": {
+    "start": "node Darwin_Project_Stream-Bot.js"
+  },
+  "dependencies": {
+    "discord.js": "11.3.0"
+  }
+}
