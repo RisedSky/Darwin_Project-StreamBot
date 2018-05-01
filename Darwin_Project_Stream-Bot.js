@@ -3,6 +3,13 @@ const bot = new Discord.Client({ autoReconnect: true })
 const config = require("./config.js").config
 let prefix = config.prefix;
 
+//Mon serv
+//let DP_FR_Server = "426157164466405377";
+//let streamer_role = "440172608969900035";
+
+let DP_FR_Server = "379235271478214657";
+let streamer_role = "439952334953381919";
+
 bot.login(config.BOT_TOKEN)
 
 bot.on("ready", () => {
@@ -10,6 +17,8 @@ bot.on("ready", () => {
     bot.user.setActivity("Started and ready").then(() => {
         setTimeout(() => {
             Activity1();
+            var looping_thing = setInterval(loop_verification, 10 * 1000)
+
         }, 30 * 1000);
     })
 
@@ -27,11 +36,41 @@ function Activity1() {
     }, 60 * 1000);
 }
 
+function loop_verification() {
+
+    bot.guilds.forEach(g => {
+        if (g.id == DP_FR_Server) {
+
+            var memb_arr = g.members.array()
+            memb_arr.forEach(user => {
+
+                //console.log(user.user.username);
+
+                if (!user.presence.game) {
+                    if (user.roles.exists("id", streamer_role)) user.removeRole(streamer_role);
+                    return;
+                }
+
+                if (!user.presence.game.streaming) return user.removeRole(streamer_role);
+
+                if (user.presence.game.streaming) {
+                    if (!user.roles.exists("id", streamer_role)) {
+                        return user.addRole(streamer_role, "Automatic role")
+                    }
+                }
+            })
+        }
+    })
+
+
+}
+
 bot.on("message", async message => {
     //#region Variables
     var Mess = message;
     var Mess_Channel = message.channel;
     var Mess_Member = message.member;
+    var Mess_Guild = message.guild;
 
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const args_test = message.content.split(" ").slice(1);
@@ -43,8 +82,38 @@ bot.on("message", async message => {
     //#endregion
 
 
-    if (!message.guild) return;
+    //console.log(`'${message.content}' from ${message.member.user.tag}`);
+
+
+    if (!Mess_Guild) return;
     if (message.author.bot) return;
+
+    /*
+    var memb_arr = Mess_Guild.members.array();
+
+    //console.log(`Sur le serv ${Mess_Guild.name}`);
+    if (Mess_Guild.id == DP_FR_Server) {
+        //console.log("Bien sur le serv DP_FR");
+
+        memb_arr.forEach(user => {
+
+            //console.log(user.user.username);
+
+            if (!user.presence.game) {
+                if (user.roles.exists("id", streamer_role)) user.removeRole(streamer_role);
+                return;
+            }
+
+            if (!user.presence.game.streaming) return user.removeRole(streamer_role);
+
+            if (user.presence.game.streaming) {
+                if (!user.roles.exists("id", streamer_role)) {
+                    return user.addRole(streamer_role, "Automatic role")
+                }
+            }
+        })
+    }
+    */
 
     if (message.content.startsWith(String(`${prefix}eval`).toLowerCase())) {
 
@@ -72,75 +141,5 @@ bot.on("message", async message => {
                 message.author.send(clean(evaled), { code: "xl", split: true });
             })
         }
-    }
-})
-
-bot.on("presenceUpdate", async (oldmember, newmember) => {
-    let streamer_role = "439952334953381919";
-
-    if (newmember.presence.game == null || oldmember.presence.game == null) {
-        console.log(`${newmember.user.tag} - game is null`);
-        newmember.guild.fetchMember(newmember)
-            .then(user => {
-                if (user.roles.exists("id", streamer_role)) {
-                    user.removeRole(streamer_role)
-                }
-            })
-
-        return;
-
-    } else if (oldmember.presence.game && !newmember.presence.game) {
-        console.log(`${newmember.user.tag} - Ne joue plus`);
-        newmember.guild.fetchMember(newmember)
-            .then(user => {
-                if (user.roles.find("id", streamer_role)) {
-                    console.log("He has the streamer role");
-
-                    newmember.guild.fetchMember(newmember)
-                        .then(user => {
-                            if (user.roles.exists("id", streamer_role)) {
-                                user.removeRole(streamer_role)
-                            }
-                        })
-                        
-                } else console.log("he dont have streamer role");
-
-                //console.log(user.roles);
-
-            })
-
-    } else if (newmember.presence.game.streaming) {
-        console.log(`${newmember.user.tag} - Stream`);
-
-
-        if (newmember.presence.game.name == `Darwin Project`) {
-            console.log(`${newmember.user.tag} - Stream sur DP`);
-            console.log(`J'ajoute donc le role streamer`);
-
-            newmember.guild.fetchMember(newmember)
-                .then(user => {
-                    if (user.roles.find("id", streamer_role)) {
-                        console.log("He already has the streamer role");
-
-                    } else {
-                        console.log("he dont have streamer role");
-                        user.addRole(streamer_role)
-                    }
-                })
-        }
-
-    } else if (oldmember.presence.game.streaming && !newmember.presence.game.streaming) {
-        //Si avant il streamait et que maintenant il ne stream plus alors:
-
-        console.log(`${newmember.user.tag} - Ne stream plus !`);
-
-        newmember.guild.fetchMember(newmember)
-            .then(user => {
-                if (user.roles.find("id", streamer_role)) {
-                    user.removeRole(streamer_role);
-                }
-            })
-
-
     }
 })
