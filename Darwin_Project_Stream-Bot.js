@@ -54,20 +54,19 @@ function loop_verification() {
                 if (!user.presence.game.streaming) return user.removeRole(streamer_role);
 
                 if (user.presence.game.streaming) {
-                    if(!user.presence.game.name == "Darwin Project") return;
-                    if (!user.roles.exists("id", streamer_role)) {
-                        return user.addRole(streamer_role, "Automatic role")
+                    if (user.presence.game.name == "Darwin Project") {
+                        if (!user.roles.exists("id", streamer_role)) {
+                            return user.addRole(streamer_role, "Automatic role")
+                        }
                     }
                 }
             })
         }
     })
-
-
 }
 
 bot.on("message", async message => {
-    
+
     //#region Variables
     var Mess = message;
     var Mess_Channel = message.channel;
