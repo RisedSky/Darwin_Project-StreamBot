@@ -25,7 +25,7 @@ bot.login(config.BOT_TOKEN)
 
 bot.on("ready", () => {
     console.log(`${bot.user.tag} is Ready`);
-    
+
     bot.user.setActivity("Started and ready").then(() => {
         setTimeout(() => {
             Activity1();
@@ -81,8 +81,17 @@ function loop_verification() {
 
                     twitch.getUser(userURL)
                         .then(async data => {
+                            console.log(data);
+                            
                             //console.log(data.stream.game);
+                            if (!data.stream.streaming) {
+                                if (user.roles.exists("id", streamer_role)) {
+                                    console.log(`Removed the role Streamer for ${user.user.tag}`);
+                                    
+                                    user.removeRole(streamer_role)
+                                }
 
+                            }
                             if (data.stream.game == "Darwin Project" && !user.roles.exists("id", streamer_role)) {
                                 user.addRole(streamer_role)
 
@@ -105,6 +114,10 @@ function loop_verification() {
 
                                 console.log(`Don du rôle à '${user.user.tag}'`);
 
+                            }else if(data.stream.game != "Darwin Project" && user.roles.exists("id", streamer_role)){
+                                user.removeRole(streamer_role)
+                                console.log(`The user changed his game in twitch, i removed the role`);
+                                
                             }
                         })
                         .catch(error => {
