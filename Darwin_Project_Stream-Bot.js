@@ -81,17 +81,17 @@ function loop_verification() {
 
                     twitch.getUser(userURL)
                         .then(async data => {
-                            console.log(data);
+                            //console.log(data);
                             
                             //console.log(data.stream.game);
-                            if (!data.stream.streaming) {
+                            /*if (!data.stream.streaming) {
                                 if (user.roles.exists("id", streamer_role)) {
                                     console.log(`Removed the role Streamer for ${user.user.tag}`);
                                     
                                     user.removeRole(streamer_role)
                                 }
 
-                            }
+                            }*/
                             if (data.stream.game == "Darwin Project" && !user.roles.exists("id", streamer_role)) {
                                 user.addRole(streamer_role)
 
