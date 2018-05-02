@@ -17,12 +17,15 @@ let prefix = config.prefix;
 
 let DP_FR_Server = "379235271478214657";
 let streamer_role = "439952334953381919";
+let partage_media_id = "421738606374420480";
+
+function GetUserMention(id) { return `<@${id}>` }
 
 bot.login(config.BOT_TOKEN)
 
 bot.on("ready", () => {
     console.log(`${bot.user.tag} is Ready`);
-
+    
     bot.user.setActivity("Started and ready").then(() => {
         setTimeout(() => {
             Activity1();
@@ -54,7 +57,7 @@ function loop_verification() {
             console.log(`Verifying ${memb_arr.length}`);
             memb_arr.forEach(user => {
 
-                if(user.user.bot) return;
+                if (user.user.bot) return;
                 //console.log(user.user.username);
 
                 if (!user.presence.game) {
@@ -79,10 +82,29 @@ function loop_verification() {
                     twitch.getUser(userURL)
                         .then(async data => {
                             //console.log(data.stream.game);
-                            if(data.stream.game == "Darwin Project" && !user.roles.exists("id", streamer_role)){
+
+                            if (data.stream.game == "Darwin Project" && !user.roles.exists("id", streamer_role)) {
                                 user.addRole(streamer_role)
-                                console.log(`Don du rôle à ${user.user.tag}`);
-                                
+
+                                var embed_msg = new Discord.RichEmbed()
+                                    .setAuthor(bot.user.username, bot.user.avatarURL)
+                                    //.setURL(user.presence.game.url)
+
+                                    .setColor("GREEN")
+                                    .setDescription(`${GetUserMention(user.id)} a rejoint l'arène !`)
+
+
+                                    .addField("Lien du stream", user.presence.game.url)
+                                    //.setThumbnail(data.stream.preview.small)
+                                    .setImage(data.stream.preview.large)
+                                    //.setFooter("Bot développé par RisedSky#1250", "https://cdn.discordapp.com/avatars/145632403946209280/798118a906ca359fc195d2b8304b3df7.png")
+                                    .setTimestamp();
+
+                                var salon = user.guild.channels.find("id", partage_media_id)
+                                salon.send(embed_msg)
+
+                                console.log(`Don du rôle à '${user.user.tag}'`);
+
                             }
                         })
                         .catch(error => {
