@@ -1,6 +1,14 @@
 const Discord = require("discord.js")
 const bot = new Discord.Client({ autoReconnect: true })
 const config = require("./config.js").config
+
+const Twitch = require("twitch.tv-api")
+const twitch = new Twitch({
+    id: config.twitch_id,
+    secret: config.twitch_secret
+})
+
+
 let prefix = config.prefix;
 
 //Mon serv
@@ -14,10 +22,11 @@ bot.login(config.BOT_TOKEN)
 
 bot.on("ready", () => {
     console.log(`${bot.user.tag} is Ready`);
+
     bot.user.setActivity("Started and ready").then(() => {
         setTimeout(() => {
             Activity1();
-            var looping_thing = setInterval(loop_verification, 10 * 1000)
+            var looping_thing = setInterval(loop_verification, 30 * 1000)
 
         }, 30 * 1000);
     })
@@ -42,23 +51,44 @@ function loop_verification() {
         if (g.id == DP_FR_Server) {
 
             var memb_arr = g.members.array()
+            console.log(`Verifying ${memb_arr.length}`);
             memb_arr.forEach(user => {
 
+                if(user.user.bot) return;
                 //console.log(user.user.username);
 
                 if (!user.presence.game) {
-                    if (user.roles.exists("id", streamer_role)) user.removeRole(streamer_role);
+                    if (user.roles.exists("id", streamer_role)) {
+                        console.log(`Removed the role streamer to ${user.user.tag} bcs not playing`)
+                        user.removeRole(streamer_role);
+                    }
                     return;
                 }
 
-                if (!user.presence.game.streaming) return user.removeRole(streamer_role);
+                if (!user.presence.game.streaming) {
+                    if (user.roles.exists("id", streamer_role)) {
+                        user.removeRole(streamer_role);
+                        console.log(`Removed the role streamer to ${user.user.tag} bcs no streaming`)
+                        return
+                    }
+                }
 
                 if (user.presence.game.streaming) {
-                    if (user.presence.game.name == "Darwin Project") {
-                        if (!user.roles.exists("id", streamer_role)) {
-                            return user.addRole(streamer_role, "Automatic role")
-                        }
-                    }
+                    let userURL = user.presence.game.url.split("/")[3]
+
+                    twitch.getUser(userURL)
+                        .then(async data => {
+                            //console.log(data.stream.game);
+                            if(data.stream.game == "Darwin Project" && !user.roles.exists("id", streamer_role)){
+                                user.addRole(streamer_role)
+                                console.log(`Don du rôle à ${user.user.tag}`);
+                                
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        })
+
                 }
             })
         }
