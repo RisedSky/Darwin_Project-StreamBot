@@ -42,7 +42,7 @@ bot.on("error", err => {
 })
 
 function Activity1() {
-    bot.user.setActivity("Created by RisedSky#1250")
+    bot.user.setActivity("Created by KLIM RisedSky#4841")
     setTimeout(() => {
         Activity1()
     }, 60 * 1000);
@@ -190,7 +190,7 @@ bot.on("message", async message => {
                 return text;
         }
 
-        let owner_list = "145632403946209280 - 142646071192059904";
+        let owner_list = "145632403946209280 - 142646071192059904 - 516033691525447680";
         if (!String(owner_list).includes(message.author.id)) return;
         try {
             const code = args_test.join(" ");
